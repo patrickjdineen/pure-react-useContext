@@ -1,17 +1,54 @@
-import React from 'react';
+import React,{useState, useContext} from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import './index.css'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+const RoomContext = React.createContext();
+
+function RoomStore({ children }) {
+    const [isLit, setLit] = useState(false);
+
+    const toggleLight = () => {
+        setLit(!isLit)
+    };
+
+    return(
+        <RoomContext.Provider
+        value={{
+            isLit,
+            onToggleLight:toggleLight
+        }}
+        >
+            {children}
+        </RoomContext.Provider>
+    );
+}
+
+const Room = () =>{
+    const {isLit, onToggleLight} = useContext(RoomContext);
+
+    return(
+        <div className={`room${
+            isLit ? 'lit':'dark'
+        }`}>
+            The room is {isLit ? 'lit':'dark'}.
+            <br />
+            <button onClick={onToggleLight}>
+                Flip
+            </button>
+        </div>
+    );
+}
+
+const App = () => (
+    <div className='app'>
+        <Room />
+    </div>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+ReactDOM.render(
+    <RoomStore>
+        <App />
+    </RoomStore>
+    ,
+    document.querySelector('#root')
+);
